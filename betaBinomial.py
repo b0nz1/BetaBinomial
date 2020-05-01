@@ -15,13 +15,15 @@ def beta_binom_density(k, n, alpha, beta):
 """
 
 # return the probablity of occurence k for a beta binomial n, alpha, beta
-# this is in the log space to prevent overflow
 def beta_binom_density_ln(k, n, alpha, beta):
+    #According to properties of beta function the probability can be written as Gamma functions
+    #Calculations are in log space to prevent overflow for large numbers
     num = gammaln(k + alpha) + gammaln(n - k + beta) + gammaln(alpha + beta)
     den = gammaln(n + alpha + beta) + gammaln(alpha) + gammaln(beta)
     log = np.log(comb(n,k)) + num - den
     return np.exp(log)
 
+# plot the probability mass function 
 def plot_beta_binom_pmf(alpha,beta,N):
     distribution = [] # list that stock the probabilty
     for k in range(N+1):
@@ -31,12 +33,14 @@ def plot_beta_binom_pmf(alpha,beta,N):
     plt.title("probability mass function")
     plt.show()
 
+#generate samples of beta-binomial distribution
 def get_samples(alpha, beta, num_samples):
     with pymc3.Model() as model:
         pymc3.Beta('b', alpha=alpha, beta=beta)
         tr = pymc3.sample(num_samples)
     return tr.get_values('b')
 
+#plot the generated data distribution
 def plot_sample_of_beta_dist(alpha, beta, N):
     samples = get_samples(alpha, beta, N)
     plt.figure(figsize=(10,5))
@@ -47,9 +51,8 @@ def plot_sample_of_beta_dist(alpha, beta, N):
     plt.title("Sample-Histogram Beta(%0.1f,%0.1f)"%(alpha,beta))
 
 if __name__ == "__main__":
-    #Plot the pmf
-    N=100
-    alpha = 1.0
+    N=1000
+    alpha = 2.0
     beta = 7.0
     
     plot_beta_binom_pmf(alpha,beta,N)
